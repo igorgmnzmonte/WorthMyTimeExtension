@@ -1,28 +1,51 @@
-// Função para criar e injetar as etiquetas em múltiplos produtos
 function injectTimeTagsInGrid() {
-    chrome.storage.local.get(['salary', 'hoursWeek'], (data) => {
-        if (!data.salary || !data.hoursWeek) return;
+    // Puxa as novas variáveis salvas no storage
+    chrome.storage.local.get(['salary', 'timeInput', 'workScale', 'timeFormat'], (data) => {
+        if (!data.salary || !data.timeInput || !data.workScale) return;
 
-        const hourlyRate = parseFloat(data.salary) / (parseFloat(data.hoursWeek) * 4.33);
+        const salary = parseFloat(data.salary);
+        const timeValue = parseFloat(data.timeInput);
+        const scale = data.workScale;
+        const format = data.timeFormat || 'auto';
+        
+        let monthlyHours = 0;
+
+        // Define as horas mensais com base na escala
+        if (scale === '12x36') {
+            monthlyHours = 180;
+        } else if (scale === '5x2') {
+            monthlyHours = (timeValue * 5) * 4.33; 
+        } else if (scale === '6x1') {
+            monthlyHours = (timeValue * 6) * 4.33;
+        } else if (scale === 'custom') {
+            monthlyHours = timeValue * 4.33; 
+        }
+
+        const hourlyRate = salary / monthlyHours;
+        const dailyDivisor = (scale === 'custom') ? 8 : timeValue;
         const currentUrl = window.location.href;
 
-        // Função auxiliar para formatar o texto de forma mais curta para vitrines
+        // Função para formatar o texto da etiqueta com base na preferência do usuário
         const formatTime = (cleanPrice) => {
-            const hoursNeeded = cleanPrice / hourlyRate;
-            if (hoursNeeded < 1) {
-                return `${(hoursNeeded * 60).toFixed(0)} Min`;
-            } else if (hoursNeeded < 24) {
-                return `${hoursNeeded.toFixed(1)}h`;
+            const hours = cleanPrice / hourlyRate;
+            
+            if (format === 'minutes') {
+                return `${(hours * 60).toFixed(0)} Min`;
+            } else if (format === 'hours') {
+                return `${hours.toFixed(1)}h`;
+            } else if (format === 'days') {
+                return `${(hours / dailyDivisor).toFixed(1)} Dias`;
             } else {
-                const days = (hoursNeeded / 8).toFixed(1);
-                return `${hoursNeeded.toFixed(0)}h (${days}d)`;
+                // Modo Automático para Vitrines (Abreviado)
+                if (hours < 1) return `${(hours * 60).toFixed(0)} Min`;
+                if (hours < 24) return `${hours.toFixed(1)}h`;
+                return `${hours.toFixed(0)}h (${(hours / dailyDivisor).toFixed(1)}d)`;
             }
         };
 
-        // Função auxiliar para montar a etiqueta visual (Menor para caber nos cards)
         const createBadge = (timeText) => {
             const badge = document.createElement('div');
-            badge.className = 'wmt-grid-badge'; // Classe para evitar duplicatas
+            badge.className = 'wmt-grid-badge'; 
             badge.style.cssText = `
                 background-color: #ecfdf5 !important;
                 color: #047857 !important;
@@ -41,13 +64,10 @@ function injectTimeTagsInGrid() {
             return badge;
         };
 
-        // --- LÓGICA PARA A AMAZON (HOME E BUSCAS) ---
+        // --- INJEÇÃO NA AMAZON ---
         if (currentUrl.includes("amazon.com.br")) {
-            // Pega todos os preços visíveis na tela
             const priceElements = document.querySelectorAll('.a-price-whole');
-            
             priceElements.forEach(priceEl => {
-                // Se o elemento pai já tem a nossa etiqueta, pula para o próximo
                 if (priceEl.parentElement.parentElement.querySelector('.wmt-grid-badge')) return;
                 
                 const priceText = priceEl.innerText.replace(/\./g, '').replace(',', '.');
@@ -55,30 +75,23 @@ function injectTimeTagsInGrid() {
                 
                 if (cleanPrice > 0) {
                     const badge = createBadge(formatTime(cleanPrice));
-                    // Injeta a etiqueta logo abaixo do bloco de preço da Amazon
                     priceEl.parentElement.parentElement.insertAdjacentElement('afterend', badge);
                 }
             });
         } 
-        
-        // --- LÓGICA PARA O MERCADO LIVRE (HOME E BUSCAS) ---
+        // --- INJEÇÃO NO MERCADO LIVRE ---
         else if (currentUrl.includes("mercadolivre.com.br")) {
-            // Pega os containers de preço dos cards de produto
             const priceContainers = document.querySelectorAll('.ui-search-price__second-line, .poly-price__current');
-            
             priceContainers.forEach(container => {
-                // Se já colocamos a etiqueta neste card, ignora
                 if (container.parentElement.querySelector('.wmt-grid-badge')) return;
                 
                 const fractionElement = container.querySelector('.andes-money-amount__fraction');
-                
                 if (fractionElement) {
                     const priceText = fractionElement.innerText.replace(/\./g, '');
                     const cleanPrice = parseFloat(priceText);
                     
                     if (cleanPrice > 0) {
                         const badge = createBadge(formatTime(cleanPrice));
-                        // Injeta a etiqueta logo após o preço no card
                         container.insertAdjacentElement('afterend', badge);
                     }
                 }
@@ -87,6 +100,5 @@ function injectTimeTagsInGrid() {
     });
 }
 
-// Como os produtos na Home e nas buscas carregam enquanto o usuário rola a tela (Lazy Load),
-// executamos a verificação a cada 2 segundos para pegar os produtos novos.
-setInterval(injectTimeTagsInGrid, 1000);
+// Continua verificando a cada 2 segundos (suporta scroll na vitrine)
+setInterval(injectTimeTagsInGrid, 2000);
