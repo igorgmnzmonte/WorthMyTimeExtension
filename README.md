@@ -34,7 +34,7 @@ A extensão lê os preços nativamente e adiciona as etiquetas verdes de tempo n
 Como a extensão ainda não está publicada na Chrome Web Store, você pode instalá-la manualmente no seu navegador em menos de 1 minuto:
 
 1. Baixe os arquivos deste repositório ou clone usando o Git:
-   `git clone https://github.com/SEU-USUARIO/worthmytime.git`
+   `git clone https://github.com/igorgmnzmonte/worthmytime.git`
 2. Abra o Google Chrome e digite na barra de endereços: `chrome://extensions/`
 3. No canto superior direito, ative o botão **"Modo do desenvolvedor"**.
 4. Clique no botão **"Carregar sem compactação"** (ou *Load unpacked*).
