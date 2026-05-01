@@ -1,47 +1,65 @@
-# ⏱️ WorthMyTime - O custo real das coisas
+# ⏱️ WorthMyTime - O Custo Real das Coisas
 
-O **WorthMyTime** é uma extensão para Google Chrome (e calculadora web) que transforma a maneira como você enxerga os preços na internet. Em vez de ver o valor de um produto em Reais, Dólares ou Euros, você visualiza **quanto tempo da sua vida** (em dias, horas ou minutos de trabalho) será necessário para comprá-lo.
+[![Licença: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.1-brightgreen.svg)](#)
+[![Stack](https://img.shields.io/badge/Stack-Vanilla_JS-yellow.svg)](#)
 
-A ferramenta foi projetada para gerar conscientização financeira e evitar compras por impulso, adaptando-se perfeitamente à sua realidade de ganhos e escala de trabalho.
+O **WorthMyTime Pro** é uma extensão de produtividade e conscientização financeira para Google Chrome. Ela transforma a maneira como você enxerga os preços na internet: em vez de visualizar apenas o valor monetário de um produto, você visualiza **quanto tempo da sua vida** (em horas e minutos de trabalho) será necessário para adquiri-lo.
 
----
-
-## ✨ Funcionalidades Principais
-
-* **Cálculo Altamente Personalizado:** Leva em consideração se você ganha por Mês, por Dia ou por Hora.
-* **Escalas de Trabalho Brasileiras:** Suporte nativo para jornadas CLT e plantões (5x2, 6x1, 12x36) ou escalas customizadas.
-* **Integração com E-commerce:** Injeta etiquetas visuais não intrusivas diretamente nas vitrines e páginas de busca das principais lojas.
-* **Conversão Visual:** Escolha se deseja ver o tempo em Minutos, Horas, Dias úteis de trabalho ou deixe no modo Automático.
-* **Múltiplas Moedas:** Suporte a BRL (R$), USD ($) e EUR (€).
+A ferramenta injeta etiquetas visuais minimalistas e nativas diretamente nas vitrines das maiores lojas de e-commerce, ajudando a combater compras por impulso através da tangibilização do seu esforço.
 
 ---
 
-## 🛒 Lojas Suportadas Automaticamente
+## ✨ Funcionalidades em Destaque
 
-A extensão lê os preços nativamente e adiciona as etiquetas verdes de tempo nos seguintes sites:
-
-| Loja | Status de Integração |
-| :--- | :--- |
-| **Amazon Brasil** | Funcionando na Home, Buscas e Página do Produto |
-| **Mercado Livre** | Funcionando na Home, Buscas e Página do Produto |
-
-> **Nota:** Estamos constantemente trabalhando para adicionar mais lojas (como Shopee e AliExpress) nas próximas versões.
+- **Injeção Dinâmica e Nativa:** Integra-se ao design original de cada site de forma limpa e profissional, sem quebrar os layouts de grade.
+- **Radares Antifraude de Preço:** Algoritmo estrutural inteligente que identifica e ignora preços antigos/riscados, calculando o tempo sempre em cima do valor real que será pago.
+- **Cálculo Desacoplado:** Conversão em tempo real baseada no seu salário líquido e horas trabalhadas mensalmente.
+- **Performance:** Construído 100% em Vanilla JavaScript, sem bibliotecas externas, garantindo zero impacto no carregamento das lojas.
 
 ---
 
+## 🛒 Lojas Suportadas
+
+A extensão possui injetores específicos adaptados à árvore do DOM das seguintes lojas:
+
+| E-commerce | Cobertura de Injeção | Estilo Visual |
+| :--- | :--- | :--- |
+| **Amazon Brasil** | Vitrines, Buscas e Página do Produto | Nativo Integrado |
+| **Mercado Livre** | Home, Buscas e Listagens | Nativo Integrado |
+| **Shopee Brasil** | Grid Principal de Produtos e Buscas | Nativo Integrado |
+| **AliExpress** | Global, Choice e Combos de Ofertas | Nativo Integrado |
+
+---
+
+## 🛠️ Arquitetura e Estrutura do Projeto
+
+O projeto segue padrões modernos de desenvolvimento de extensões de navegador (Manifest V3), utilizando arquitetura modular para facilitar manutenção e escalabilidade.
+
+```text
+WorthMyTimePro/
+├── manifest.json         # Configurações e permissões (Manifest V3)
+├── popup/                # Interface da extensão
+│   ├── popup.html
+│   ├── popup.css
+│   └── popup.js
+└── scripts/              # Injeção de conteúdo (Content Scripts)
+    ├── config.js         # Variáveis de negócio e parametrização do usuário
+    ├── utils.js          # Motores de cálculo e geradores de componentes DOM
+    ├── content.js        # Regras de observação e injeção por domínio
+    └── content.css       # Camada de estilos (CSS) isolada da lógica
+```
 ## 🚀 Como Instalar (Modo Desenvolvedor)
 
 Como a extensão ainda não está publicada na Chrome Web Store, você pode instalá-la manualmente no seu navegador em menos de 1 minuto:
 
 1. Baixe os arquivos deste repositório ou clone usando o Git:
-   `git clone https://github.com/igorgmnzmonte/worthmytime.git`
+   `git clone https://github.com/SEU-USUARIO/worthmytime.git`
 2. Abra o Google Chrome e digite na barra de endereços: `chrome://extensions/`
 3. No canto superior direito, ative o botão **"Modo do desenvolvedor"**.
 4. Clique no botão **"Carregar sem compactação"** (ou *Load unpacked*).
 5. Selecione a pasta onde você salvou os arquivos do projeto.
 6. Pronto! O ícone do WorthMyTime aparecerá na barra de extensões do seu navegador.
-
----
 
 ## 📖 Como Usar
 
@@ -51,20 +69,7 @@ Como a extensão ainda não está publicada na Chrome Web Store, você pode inst
    * **Seus Ganhos:** Insira seu salário líquido e escolha se ele é Mensal, Diário ou por Hora.
    * **Sua Escala:** Escolha sua rotina (ex: 5x2, 12x36).
 3. **Teste Rápido:** Você pode usar o campo "Teste um Preço" diretamente no painel para cálculos avulsos.
-4. **Mágica em Ação:** Acesse a Amazon ou o Mercado Livre. Os preços dos produtos agora terão uma etiqueta verde indicando o tempo exato de trabalho necessário para comprá-los!
-
----
-
-## 🛠️ Estrutura do Projeto
-
-O projeto foi construído utilizando Vanilla JavaScript, HTML5 e CSS3, sem dependência de bibliotecas externas, garantindo alta velocidade e baixo consumo de memória.
-
-* `manifest.json`: Arquivo de configuração e permissões da extensão.
-* `popup.html` / `popup.js`: Interface e lógica do painel da extensão.
-* `content.js`: Motor de injeção que roda em segundo plano nas lojas suportadas para inserir as etiquetas.
-* `index.html`: Versão web independente (Calculadora de Tela Cheia).
-
----
+4. **Mágica em Ação:** Acesse algum dos sites disponíveis(Amazon, Mercado-Livre e etc). Os preços dos produtos agora terão uma etiqueta ao lado ou abaixo do preço indicando o tempo exato de trabalho necessário para comprá-los!
 
 ## 🤝 Como Contribuir
 
