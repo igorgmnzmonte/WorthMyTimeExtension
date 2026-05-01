@@ -1,0 +1,31 @@
+/* scripts/content.css */
+
+.wmt-time-display {
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+    margin-left: 8px !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    font-family: inherit !important;
+    pointer-events: none;
+}
+
+.wmt-icon {
+    display: inline-flex !important;
+    margin-right: 4px !important;
+    color: #888888 !important;
+}
+
+.wmt-text {
+    color: #047857 !important; /* Verde profissional */
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+}
+
+/* Ajuste específico para garantir que não quebre layouts de grade */
+.wmt-time-display {
+    flex-shrink: 0 !important;
+}

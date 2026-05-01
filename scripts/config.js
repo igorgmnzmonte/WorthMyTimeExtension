@@ -1,0 +1,4 @@
+// scripts/config.js
+const SALARY_PER_MONTH = 3000; 
+const HOURS_PER_MONTH = 220;   
+const HOURLY_WAGE = SALARY_PER_MONTH / HOURS_PER_MONTH;

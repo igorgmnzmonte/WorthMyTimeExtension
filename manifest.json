@@ -1,21 +1,26 @@
 {
   "manifest_version": 3,
   "name": "WorthMyTime",
-  "version": "1.0",
-  "description": "Veja quanto tempo de trabalho custa cada produto.",
-  "permissions": ["storage", "activeTab"],
+  "version": "1.1",
+  "description": "Veja o custo dos produtos em horas de trabalho.",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
   },
   "content_scripts": [
     {
       "matches": [
-        "*://*.amazon.com.br/*",
-        "*://*.mercadolivre.com.br/*",
+        "*://*.aliexpress.com/*",
         "*://*.shopee.com.br/*",
-        "*://*.pt.aliexpress.com/*"
+        "*://*.mercadolivre.com.br/*",
+        "*://*.amazon.com.br/*"
       ],
-      "js": ["content.js"]
+      "js": [
+        "scripts/config.js", 
+        "scripts/utils.js", 
+        "scripts/content.js"
+      ],
+      "css": ["scripts/content.css"]
     }
-  ]
+  ],
+  "permissions": ["storage"]
 }
