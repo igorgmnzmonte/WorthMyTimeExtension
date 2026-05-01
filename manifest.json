@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "WorthMyTime",
+  "version": "1.0",
+  "description": "Veja quanto tempo de trabalho custa cada produto.",
+  "permissions": ["storage", "activeTab"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.amazon.com.br/*", "https://*.mercadolivre.com.br/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
