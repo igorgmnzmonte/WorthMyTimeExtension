@@ -1,87 +1,92 @@
-function injectTimeTag() {
+// Função para criar e injetar as etiquetas em múltiplos produtos
+function injectTimeTagsInGrid() {
     chrome.storage.local.get(['salary', 'hoursWeek'], (data) => {
         if (!data.salary || !data.hoursWeek) return;
 
         const hourlyRate = parseFloat(data.salary) / (parseFloat(data.hoursWeek) * 4.33);
-        let priceText = null;
-        let targetElement = null; // O elemento ONDE vamos pendurar a tag
         const currentUrl = window.location.href;
 
-        // --- SELEÇÃO ESPECÍFICA POR LOJA ---
+        // Função auxiliar para formatar o texto de forma mais curta para vitrines
+        const formatTime = (cleanPrice) => {
+            const hoursNeeded = cleanPrice / hourlyRate;
+            if (hoursNeeded < 1) {
+                return `${(hoursNeeded * 60).toFixed(0)} Min`;
+            } else if (hoursNeeded < 24) {
+                return `${hoursNeeded.toFixed(1)}h`;
+            } else {
+                const days = (hoursNeeded / 8).toFixed(1);
+                return `${hoursNeeded.toFixed(0)}h (${days}d)`;
+            }
+        };
 
+        // Função auxiliar para montar a etiqueta visual (Menor para caber nos cards)
+        const createBadge = (timeText) => {
+            const badge = document.createElement('div');
+            badge.className = 'wmt-grid-badge'; // Classe para evitar duplicatas
+            badge.style.cssText = `
+                background-color: #ecfdf5 !important;
+                color: #047857 !important;
+                border: 1px solid #a7f3d0 !important;
+                padding: 4px 8px !important;
+                margin-top: 4px !important;
+                border-radius: 6px !important;
+                font-weight: bold !important;
+                font-size: 11px !important;
+                font-family: sans-serif !important;
+                display: inline-block !important;
+                z-index: 10 !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+            `;
+            badge.innerHTML = `⏱️ ${timeText}`;
+            return badge;
+        };
+
+        // --- LÓGICA PARA A AMAZON (HOME E BUSCAS) ---
         if (currentUrl.includes("amazon.com.br")) {
-            // Seleciona o símbolo do Real no preço principal
-            const priceSymbol = document.querySelector('.a-price-symbol');
-            // O container do preço que queremos ficar de fora
-            const priceContainer = document.querySelector('#corePriceDisplay_desktop_feature_div, #corePrice_feature_div');
+            // Pega todos os preços visíveis na tela
+            const priceElements = document.querySelectorAll('.a-price-whole');
             
-            if (priceSymbol && priceContainer) {
-                // Pega o texto do container pai do símbolo, que costuma ter o preço completo
-                priceText = priceSymbol.parentElement.innerText;
-                targetElement = priceContainer; // Vamos injetar DEPOIS desse container
-            }
-        } 
-        else if (currentUrl.includes("mercadolivre.com.br")) {
-            // Seleciona a fração do preço
-            const priceFraction = document.querySelector('.ui-pdp-price__second-line .andes-money-amount__fraction');
-            // O container da linha do preço
-            const priceContainer = document.querySelector('.ui-pdp-price__second-line');
-            
-            if (priceFraction && priceContainer) {
-                priceText = priceFraction.innerText;
-                targetElement = priceContainer; // Vamos injetar DEPOIS desse container
-            }
-        }
-
-        // --- LÓGICA DE CÁLCULO E INJEÇÃO (Visual Novo) ---
-
-        if (priceText && targetElement && !document.getElementById('wmt-badge')) {
-            // Limpeza do preço (remove R$, espaços, pontos e trata vírgula)
-            const cleanPrice = parseFloat(priceText.replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.'));
-            
-            if (cleanPrice > 0) {
-                const hoursNeeded = cleanPrice / hourlyRate;
+            priceElements.forEach(priceEl => {
+                // Se o elemento pai já tem a nossa etiqueta, pula para o próximo
+                if (priceEl.parentElement.parentElement.querySelector('.wmt-grid-badge')) return;
                 
-                let timeString = '';
-                if (hoursNeeded < 1) {
-                    timeString = `${(hoursNeeded * 60).toFixed(0)} Minutos`;
-                } else if (hoursNeeded < 24) {
-                    timeString = `${hoursNeeded.toFixed(1)} Horas`;
-                } else {
-                    const days = (hoursNeeded / 8).toFixed(1);
-                    timeString = `${hoursNeeded.toFixed(0)} Horas (${days} dias úteis)`;
+                const priceText = priceEl.innerText.replace(/\./g, '').replace(',', '.');
+                const cleanPrice = parseFloat(priceText);
+                
+                if (cleanPrice > 0) {
+                    const badge = createBadge(formatTime(cleanPrice));
+                    // Injeta a etiqueta logo abaixo do bloco de preço da Amazon
+                    priceEl.parentElement.parentElement.insertAdjacentElement('afterend', badge);
                 }
-
-                // Criação do Elemento com a NOVA PALETA (Branco e Verde)
-                const badge = document.createElement('div');
-                badge.id = 'wmt-badge';
-                // CSS Inline para garantir que não sofra interferência do site
-                badge.style.cssText = `
-                    background-color: #ecfdf5 !important;
-                    color: #047857 !important;
-                    border: 1px solid #a7f3d0 !important;
-                    padding: 10px 15px !important;
-                    margin-top: 15px !important;
-                    margin-bottom: 15px !important;
-                    border-radius: 8px !important;
-                    font-weight: bold !important;
-                    font-size: 14px !important;
-                    font-family: sans-serif !important;
-                    display: block !important;
-                    clear: both !important;
-                    width: fit-content !important;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-                `;
-                badge.innerHTML = `⏱️ Custa: ${timeString}`;
-
-                // --- O PULO DO GATO PARA NÃO SOBREPOR ---
-                // insertAdjacentElement('afterend') coloca o elemento LOGO APÓS o bloco de preço,
-                // no fluxo normal da página, empurrando o resto do conteúdo para baixo.
-                targetElement.insertAdjacentElement('afterend', badge);
-            }
+            });
+        } 
+        
+        // --- LÓGICA PARA O MERCADO LIVRE (HOME E BUSCAS) ---
+        else if (currentUrl.includes("mercadolivre.com.br")) {
+            // Pega os containers de preço dos cards de produto
+            const priceContainers = document.querySelectorAll('.ui-search-price__second-line, .poly-price__current');
+            
+            priceContainers.forEach(container => {
+                // Se já colocamos a etiqueta neste card, ignora
+                if (container.parentElement.querySelector('.wmt-grid-badge')) return;
+                
+                const fractionElement = container.querySelector('.andes-money-amount__fraction');
+                
+                if (fractionElement) {
+                    const priceText = fractionElement.innerText.replace(/\./g, '');
+                    const cleanPrice = parseFloat(priceText);
+                    
+                    if (cleanPrice > 0) {
+                        const badge = createBadge(formatTime(cleanPrice));
+                        // Injeta a etiqueta logo após o preço no card
+                        container.insertAdjacentElement('afterend', badge);
+                    }
+                }
+            });
         }
     });
 }
 
-// Aumentei um pouco o tempo para garantir layouts dinâmicos
-setTimeout(injectTimeTag, 3000);
+// Como os produtos na Home e nas buscas carregam enquanto o usuário rola a tela (Lazy Load),
+// executamos a verificação a cada 2 segundos para pegar os produtos novos.
+setInterval(injectTimeTagsInGrid, 1000);
