@@ -1,113 +1,180 @@
-function injectTimeTagsInGrid() {
-    chrome.storage.local.get(['salary', 'salaryType', 'timeInput', 'workScale', 'timeFormat'], (data) => {
-        if (!data.salary || !data.timeInput || !data.workScale) return;
+// ==========================================
+// CONFIGURAÇÕES DO USUÁRIO (Salário e Horas)
+// ==========================================
+const SALARY_PER_MONTH = 3000; // Altere para seu salário real
+const HOURS_PER_MONTH = 220;   // Altere para suas horas mensais
+const HOURLY_WAGE = SALARY_PER_MONTH / HOURS_PER_MONTH;
 
-        const salary = parseFloat(data.salary);
-        const type = data.salaryType || 'monthly';
-        const timeValue = parseFloat(data.timeInput);
-        const scale = data.workScale;
-        const format = data.timeFormat || 'auto';
-        
-        let hourlyRate = 0;
-        const dailyDivisor = (scale === 'custom') ? 8 : timeValue;
+// ==========================================
+// FUNÇÕES AUXILIARES
+// ==========================================
 
-        if (type === 'hourly') {
-            hourlyRate = salary;
-        } else if (type === 'daily') {
-            hourlyRate = salary / dailyDivisor;
-        } else {
-            let monthlyHours = 0;
-            if (scale === '12x36') monthlyHours = 180;
-            else if (scale === '5x2') monthlyHours = (timeValue * 5) * 4.33; 
-            else if (scale === '6x1') monthlyHours = (timeValue * 6) * 4.33;
-            else if (scale === 'custom') monthlyHours = timeValue * 4.33; 
-            
-            hourlyRate = salary / monthlyHours;
-        }
-
-        const currentUrl = window.location.href;
-
-        const formatTime = (cleanPrice) => {
-            const hours = cleanPrice / hourlyRate;
-            if (format === 'minutes') return `${(hours * 60).toFixed(0)} Min`;
-            if (format === 'hours') return `${hours.toFixed(1)}h`;
-            if (format === 'days') return `${(hours / dailyDivisor).toFixed(1)} Dias`;
-            if (hours < 1) return `${(hours * 60).toFixed(0)} Min`;
-            if (hours < 24) return `${hours.toFixed(1)}h`;
-            return `${hours.toFixed(0)}h (${(hours / dailyDivisor).toFixed(1)}d)`;
-        };
-
-        const createBadge = (timeText) => {
-            const badge = document.createElement('div');
-            // Mantemos a classe para identificação
-            badge.className = 'wmt-grid-badge'; 
-            badge.style.cssText = `
-                background-color: #ecfdf5 !important;
-                color: #047857 !important;
-                border: 1px solid #a7f3d0 !important;
-                padding: 4px 8px !important;
-                margin-top: 4px !important;
-                margin-bottom: 4px !important;
-                border-radius: 6px !important;
-                font-weight: bold !important;
-                font-size: 11px !important;
-                font-family: sans-serif !important;
-                display: inline-block !important;
-                z-index: 10 !important;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-            `;
-            badge.innerHTML = `⏱️ ${timeText}`;
-            return badge;
-        };
-
-        // --- INJEÇÃO NA AMAZON (Lógica Corrigida) ---
-        if (currentUrl.includes("amazon.com.br")) {
-            // Seleciona o container visual do preço (funciona em homes e buscas)
-            const priceContainers = document.querySelectorAll('.a-price');
-            
-            priceContainers.forEach(container => {
-                // CORREÇÃO AQUI: Verificamos se o VIZINHO IMEDIATO já é nossa etiqueta
-                const nextElement = container.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('wmt-grid-badge')) {
-                    return; // Já existe, pula
-                }
-
-                // Tenta pegar o preço inteiro de dentro do container
-                const wholeNumberEl = container.querySelector('.a-price-whole');
-                if (wholeNumberEl) {
-                    // Limpa o texto (remove pontos de milhar e trata vírgula)
-                    const priceText = wholeNumberEl.innerText.replace(/\./g, '').replace(',', '.');
-                    const cleanPrice = parseFloat(priceText);
-                    
-                    if (cleanPrice > 0) {
-                        const badge = createBadge(formatTime(cleanPrice));
-                        // Inserimos COMO VIZINHO (afterend)
-                        container.insertAdjacentElement('afterend', badge);
-                    }
-                }
-            });
-        } 
-        
-        // --- INJEÇÃO NO MERCADO LIVRE (Mantida, pois já estava correta) ---
-        else if (currentUrl.includes("mercadolivre.com.br")) {
-            const priceContainers = document.querySelectorAll('.ui-search-price__second-line, .poly-price__current');
-            priceContainers.forEach(container => {
-                // No ML inserimos DENTRO do container, então querySelector interno funciona
-                if (container.querySelector('.wmt-grid-badge')) return;
-                
-                const fractionElement = container.querySelector('.andes-money-amount__fraction');
-                if (fractionElement) {
-                    const priceText = fractionElement.innerText.replace(/\./g, '');
-                    const cleanPrice = parseFloat(priceText);
-                    
-                    if (cleanPrice > 0) {
-                        const badge = createBadge(formatTime(cleanPrice));
-                        container.appendChild(badge);
-                    }
-                }
-            });
-        }
-    });
+// Converte o valor em reais para horas/minutos trabalhados
+function formatTime(price) {
+    const totalHours = price / HOURLY_WAGE;
+    if (totalHours < 1) {
+        const minutes = Math.round(totalHours * 60);
+        return `${minutes} Min`;
+    }
+    return `${totalHours.toFixed(1)}h`;
 }
 
-setInterval(injectTimeTagsInGrid, 2000);
+// Estilo Unificado: Ícone Sutil (Inspirado no AliExpress)
+function createTimeDisplay(text) {
+    const container = document.createElement('div');
+    container.className = 'wmt-time-display';
+    container.style.cssText = `
+        display: inline-flex !important;
+        align-items: center !important;
+        vertical-align: middle !important;
+        margin-left: 8px !important;
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
+        font-family: inherit !important;
+    `;
+
+    const icon = document.createElement('span');
+    // Ícone de relógio em SVG
+    icon.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#888888" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 3.5V6L7.5 7.5" stroke="#888888" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    icon.style.cssText = `
+        display: inline-flex !important;
+        margin-right: 4px !important;
+    `;
+
+    const textElement = document.createElement('span');
+    textElement.textContent = text;
+    textElement.style.cssText = `
+        color: #047857 !important; /* Verde sutil e profissional */
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+    `;
+
+    container.appendChild(icon);
+    container.appendChild(textElement);
+
+    return container;
+}
+
+// ==========================================
+// LÓGICA PRINCIPAL DE BUSCA E INJEÇÃO
+// ==========================================
+
+function processPrices() {
+    const currentUrl = window.location.href;
+
+    // --- AMAZON ---
+    if (currentUrl.includes("amazon.com.br")) {
+        const priceContainers = document.querySelectorAll('.a-price');
+        priceContainers.forEach(container => {
+            if (container.nextElementSibling && container.nextElementSibling.classList.contains('wmt-time-display')) return;
+
+            const wholeNumberEl = container.querySelector('.a-price-whole');
+            if (wholeNumberEl) {
+                const priceText = wholeNumberEl.innerText.replace(/\./g, '').replace(',', '.');
+                const cleanPrice = parseFloat(priceText);
+                if (cleanPrice > 0) {
+                    container.insertAdjacentElement('afterend', createTimeDisplay(formatTime(cleanPrice)));
+                }
+            }
+        });
+    } 
+    
+    // --- MERCADO LIVRE ---
+    else if (currentUrl.includes("mercadolivre.com.br")) {
+        const priceContainers = document.querySelectorAll('.ui-search-price__second-line, .poly-price__current');
+        priceContainers.forEach(container => {
+            if (container.querySelector('.wmt-time-display')) return;
+            
+            const fractionElement = container.querySelector('.andes-money-amount__fraction');
+            if (fractionElement) {
+                const priceText = fractionElement.innerText.replace(/\./g, '');
+                const cleanPrice = parseFloat(priceText);
+                if (cleanPrice > 0) {
+                    container.appendChild(createTimeDisplay(formatTime(cleanPrice)));
+                }
+            }
+        });
+    }
+
+    // --- SHOPEE ---
+    else if (currentUrl.includes("shopee.com.br")) {
+        const allSpans = document.querySelectorAll('span');
+        allSpans.forEach((span) => {
+            if (span.textContent.includes('R$')) {
+                let isOldPrice = false;
+                let currentNode = span;
+                for (let i = 0; i < 4; i++) {
+                    if (!currentNode) break;
+                    let sibling = currentNode.nextElementSibling;
+                    while (sibling) {
+                        if (sibling.textContent.includes('R$')) { isOldPrice = true; break; }
+                        sibling = sibling.nextElementSibling;
+                    }
+                    if (isOldPrice) break;
+                    currentNode = currentNode.parentElement;
+                }
+                if (isOldPrice) return; 
+
+                const parentContainer = span.parentElement;
+                if (parentContainer) {
+                    let cleanText = parentContainer.textContent.replace(/\s+/g, '');
+                    const priceMatch = cleanText.match(/\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+(?:,\d{2})?/);
+                    if (priceMatch) {
+                        let priceText = priceMatch[0].replace(/\./g, '').replace(',', '.');
+                        const cleanPrice = parseFloat(priceText);
+                        if (cleanPrice > 0) {
+                            let safeContainer = parentContainer;
+                            while (safeContainer && safeContainer.classList && safeContainer.classList.contains('truncate')) {
+                                safeContainer = safeContainer.parentElement;
+                            }
+                            if (safeContainer && !safeContainer.querySelector('.wmt-time-display')) {
+                                safeContainer.appendChild(createTimeDisplay(formatTime(cleanPrice)));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // --- ALIEXPRESS ---
+    else if (currentUrl.includes("aliexpress.com")) {
+        const allSpans = document.querySelectorAll('span');
+        allSpans.forEach((span) => {
+            if (span.textContent.includes('R$')) {
+                let isOldPrice = false;
+                let checkNode = span;
+                for (let i = 0; i < 4; i++) {
+                    if (!checkNode) break;
+                    const style = window.getComputedStyle(checkNode);
+                    const inlineStyle = checkNode.getAttribute('style') || '';
+                    if (style.textDecoration.includes('line-through') || inlineStyle.includes('line-through')) {
+                        isOldPrice = true;
+                        break;
+                    }
+                    checkNode = checkNode.parentElement;
+                }
+                if (isOldPrice) return; 
+
+                const parentContainer = span.parentElement;
+                if (parentContainer) {
+                    let cleanText = parentContainer.textContent.replace(/\s+/g, '');
+                    const priceMatch = cleanText.match(/\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+(?:,\d{2})?/);
+                    if (priceMatch) {
+                        let priceText = priceMatch[0].replace(/\./g, '').replace(',', '.');
+                        const cleanPrice = parseFloat(priceText);
+                        if (cleanPrice > 0 && !parentContainer.querySelector('.wmt-time-display')) {
+                            parentContainer.appendChild(createTimeDisplay(formatTime(cleanPrice)));
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Inicialização
+processPrices();
+setInterval(processPrices, 1500);

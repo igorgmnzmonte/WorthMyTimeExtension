@@ -9,7 +9,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.amazon.com.br/*", "https://*.mercadolivre.com.br/*"],
+      "matches": [
+        "*://*.amazon.com.br/*",
+        "*://*.mercadolivre.com.br/*",
+        "*://*.shopee.com.br/*",
+        "*://*.pt.aliexpress.com/*"
+      ],
       "js": ["content.js"]
     }
   ]
