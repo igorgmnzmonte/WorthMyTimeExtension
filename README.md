@@ -1,83 +1,156 @@
-# ⏱️ WorthMyTime - O custo real das coisas
+# ⏱️ WorthMyTime Pro - O Custo Real das Coisas
 
-O **WorthMyTime** é uma extensão para Google Chrome (e calculadora web) que transforma a maneira como você enxerga os preços na internet. Em vez de ver o valor de um produto em Reais, Dólares ou Euros, você visualiza **quanto tempo da sua vida** (em dias, horas ou minutos de trabalho) será necessário para comprá-lo.
+[![Licença: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.1-brightgreen.svg)](#)
+[![Stack](https://img.shields.io/badge/Stack-Vanilla_JS-yellow.svg)](#)
 
-A ferramenta foi projetada para gerar conscientização financeira e evitar compras por impulso, adaptando-se perfeitamente à sua realidade de ganhos e escala de trabalho.
+O **WorthMyTime Pro** é uma extensão de produtividade e conscientização financeira para Google Chrome. Ela transforma a maneira como você enxerga os preços na internet: em vez de visualizar apenas o valor monetário de um produto, você visualiza **quanto tempo da sua vida** (em horas e minutos de trabalho) será necessário para adquiri-lo.
 
----
-
-## ✨ Funcionalidades Principais
-
-* **Cálculo Altamente Personalizado:** Leva em consideração se você ganha por Mês, por Dia ou por Hora.
-* **Escalas de Trabalho Brasileiras:** Suporte nativo para jornadas CLT e plantões (5x2, 6x1, 12x36) ou escalas customizadas.
-* **Integração com E-commerce:** Injeta etiquetas visuais não intrusivas diretamente nas vitrines e páginas de busca das principais lojas.
-* **Conversão Visual:** Escolha se deseja ver o tempo em Minutos, Horas, Dias úteis de trabalho ou deixe no modo Automático.
-* **Múltiplas Moedas:** Suporte a BRL (R$), USD ($) e EUR (€).
+A ferramenta injeta etiquetas visuais minimalistas e nativas diretamente nas vitrines das maiores lojas de e-commerce, ajudando a combater compras por impulso através da tangibilização do seu esforço.
 
 ---
 
-## 🛒 Lojas Suportadas Automaticamente
+## ✨ Funcionalidades em Destaque
 
-A extensão lê os preços nativamente e adiciona as etiquetas verdes de tempo nos seguintes sites:
-
-| Loja | Status de Integração |
-| :--- | :--- |
-| **Amazon Brasil** | Funcionando na Home, Buscas e Página do Produto |
-| **Mercado Livre** | Funcionando na Home, Buscas e Página do Produto |
-
-> **Nota:** Estamos constantemente trabalhando para adicionar mais lojas (como Shopee e AliExpress) nas próximas versões.
+- **Injeção Dinâmica e Nativa:** Integra-se ao design original de cada site de forma limpa e profissional, sem quebrar os layouts de grade.
+- **Radares Antifraude de Preço:** Algoritmo estrutural inteligente que identifica e ignora preços antigos/riscados, calculando o tempo sempre em cima do valor real que será pago.
+- **Cálculo Desacoplado:** Conversão em tempo real baseada no seu salário líquido e horas trabalhadas mensalmente.
+- **Performance:** Construído 100% em Vanilla JavaScript, sem bibliotecas externas, garantindo zero impacto no carregamento das lojas.
 
 ---
 
-## 🚀 Como Instalar (Modo Desenvolvedor)
+## 🛒 Lojas Suportadas
 
-Como a extensão ainda não está publicada na Chrome Web Store, você pode instalá-la manualmente no seu navegador em menos de 1 minuto:
+A extensão possui injetores específicos adaptados à árvore do DOM das seguintes lojas:
 
-1. Baixe os arquivos deste repositório ou clone usando o Git:
-   `git clone https://github.com/igorgmnzmonte/worthmytime.git`
-2. Abra o Google Chrome e digite na barra de endereços: `chrome://extensions/`
-3. No canto superior direito, ative o botão **"Modo do desenvolvedor"**.
-4. Clique no botão **"Carregar sem compactação"** (ou *Load unpacked*).
-5. Selecione a pasta onde você salvou os arquivos do projeto.
-6. Pronto! O ícone do WorthMyTime aparecerá na barra de extensões do seu navegador.
-
----
-
-## 📖 Como Usar
-
-1. Clique no ícone do **WorthMyTime** no topo do seu navegador para abrir o painel.
-2. Preencha suas configurações financeiras:
-   * **Moeda e Exibição:** Escolha R$ e como quer ver o tempo (ex: Dias).
-   * **Seus Ganhos:** Insira seu salário líquido e escolha se ele é Mensal, Diário ou por Hora.
-   * **Sua Escala:** Escolha sua rotina (ex: 5x2, 12x36).
-3. **Teste Rápido:** Você pode usar o campo "Teste um Preço" diretamente no painel para cálculos avulsos.
-4. **Mágica em Ação:** Acesse a Amazon ou o Mercado Livre. Os preços dos produtos agora terão uma etiqueta verde indicando o tempo exato de trabalho necessário para comprá-los!
+| E-commerce | Cobertura de Injeção | Estilo Visual |
+| :--- | :--- | :--- |
+| **Amazon Brasil** | Vitrines, Buscas e Página do Produto | Nativo Integrado |
+| **Mercado Livre** | Home, Buscas e Listagens | Nativo Integrado |
+| **Shopee Brasil** | Grid Principal de Produtos e Buscas | Nativo Integrado |
+| **AliExpress** | Global, Choice e Combos de Ofertas | Nativo Integrado |
 
 ---
 
-## 🛠️ Estrutura do Projeto
+## 🛠️ Arquitetura e Estrutura do Projeto
 
-O projeto foi construído utilizando Vanilla JavaScript, HTML5 e CSS3, sem dependência de bibliotecas externas, garantindo alta velocidade e baixo consumo de memória.
+O projeto segue padrões modernos de desenvolvimento de extensões de navegador (Manifest V3), utilizando arquitetura modular para facilitar manutenção e escalabilidade.
 
-* `manifest.json`: Arquivo de configuração e permissões da extensão.
-* `popup.html` / `popup.js`: Interface e lógica do painel da extensão.
-* `content.js`: Motor de injeção que roda em segundo plano nas lojas suportadas para inserir as etiquetas.
-* `index.html`: Versão web independente (Calculadora de Tela Cheia).
+```text
+WorthMyTimePro/
+├── manifest.json         # Configurações e permissões (Manifest V3)
+├── popup/                # Interface da extensão
+│   ├── popup.html
+│   ├── popup.css
+│   └── popup.js
+└── scripts/              # Injeção de conteúdo (Content Scripts)
+    ├── config.js         # Variáveis de negócio e parametrização do usuário
+    ├── utils.js          # Motores de cálculo e geradores de componentes DOM
+    ├── content.js        # Regras de observação e injeção por domínio
+    └── content.css       # Camada de estilos (CSS) isolada da lógica
+
+Sem problemas! O ícone a gente pode rever em outro momento, no design que você achar melhor. Focar na documentação agora é o caminho certo, pois com as atualizações que fizemos (suporte a Shopee e AliExpress, nova arquitetura modular, design nativo), o projeto está em um nível muito mais avançado.
+
+Aqui está o seu novo README.md reescrito de forma altamente profissional, focado na nova arquitetura e nas funcionalidades atuais. É só copiar o bloco inteiro abaixo e colar no seu arquivo.
+
+Markdown
+# ⏱️ WorthMyTime Pro - O Custo Real das Coisas
+
+[![Licença: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.1-brightgreen.svg)](#)
+[![Stack](https://img.shields.io/badge/Stack-Vanilla_JS-yellow.svg)](#)
+
+O **WorthMyTime Pro** é uma extensão de produtividade e conscientização financeira para Google Chrome. Ela transforma a maneira como você enxerga os preços na internet: em vez de visualizar apenas o valor monetário de um produto, você visualiza **quanto tempo da sua vida** (em horas e minutos de trabalho) será necessário para adquiri-lo.
+
+A ferramenta injeta etiquetas visuais minimalistas e nativas diretamente nas vitrines das maiores lojas de e-commerce, ajudando a combater compras por impulso através da tangibilização do seu esforço.
 
 ---
 
-## 🤝 Como Contribuir
+## ✨ Funcionalidades em Destaque
 
-Contribuições são muito bem-vindas! Se você deseja adicionar suporte a uma nova loja ou melhorar a matemática do projeto:
-
-1. Faça um Fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/NovaLoja`)
-3. Faça o commit das suas alterações (`git commit -m 'Adiciona suporte para NovaLoja'`)
-4. Faça o push para a branch (`git push origin feature/NovaLoja`)
-5. Abra um Pull Request
+- **Injeção Dinâmica e Nativa:** Integra-se ao design original de cada site de forma limpa e profissional, sem quebrar os layouts de grade.
+- **Radares Antifraude de Preço:** Algoritmo estrutural inteligente que identifica e ignora preços antigos/riscados, calculando o tempo sempre em cima do valor real que será pago.
+- **Cálculo Desacoplado:** Conversão em tempo real baseada no seu salário líquido e horas trabalhadas mensalmente.
+- **Performance:** Construído 100% em Vanilla JavaScript, sem bibliotecas externas, garantindo zero impacto no carregamento das lojas.
 
 ---
 
-## 📄 Licença
+## 🛒 Lojas Suportadas
 
-Este projeto está sob a licença MIT. Sinta-se livre para usá-lo, modificá-lo e distribuí-lo.
+A extensão possui injetores específicos adaptados à árvore do DOM das seguintes lojas:
+
+| E-commerce | Cobertura de Injeção | Estilo Visual |
+| :--- | :--- | :--- |
+| **Amazon Brasil** | Vitrines, Buscas e Página do Produto | Nativo Integrado |
+| **Mercado Livre** | Home, Buscas e Listagens | Nativo Integrado |
+| **Shopee Brasil** | Grid Principal de Produtos e Buscas | Nativo Integrado |
+| **AliExpress** | Global, Choice e Combos de Ofertas | Nativo Integrado |
+
+---
+
+## 🛠️ Arquitetura e Estrutura do Projeto
+
+O projeto segue padrões modernos de desenvolvimento de extensões de navegador (Manifest V3), utilizando arquitetura modular para facilitar manutenção e escalabilidade.
+
+```text
+WorthMyTimePro/
+├── manifest.json         # Configurações e permissões (Manifest V3)
+├── popup/                # Interface da extensão
+│   ├── popup.html
+│   ├── popup.css
+│   └── popup.js
+└── scripts/              # Injeção de conteúdo (Content Scripts)
+    ├── config.js         # Variáveis de negócio e parametrização do usuário
+    ├── utils.js          # Motores de cálculo e geradores de componentes DOM
+    ├── content.js        # Regras de observação e injeção por domínio
+    └── content.css       # Camada de estilos (CSS) isolada da lógica
+
+##🚀 Instalação (Modo Desenvolvedor)
+Clone este repositório em sua máquina:
+
+Bash
+git clone [https://github.com/seu-usuario/worthmytime-pro.git](https://github.com/seu-usuario/worthmytime-pro.git)
+Abra o Google Chrome e acesse chrome://extensions/.
+
+No canto superior direito, ative o "Modo do desenvolvedor".
+
+Clique em "Carregar sem compactação" (ou Load unpacked).
+
+Selecione a pasta principal do projeto. O ícone da extensão ficará disponível em seu navegador.
+
+##⚙️ Configuração Pessoal
+Para que a ferramenta calcule o tempo exato da sua realidade, edite as variáveis no arquivo scripts/config.js antes de carregar a extensão no Chrome:
+
+JavaScript
+// scripts/config.js
+const SALARY_PER_MONTH = 3000; // Altere para seu salário líquido mensal
+const HOURS_PER_MONTH = 220;   // Altere para sua jornada de horas mensais
+Dica: Após alterar as configurações, clique no botão de "Recarregar" a extensão na aba chrome://extensions/.
+
+##🤝 Como Contribuir
+Contribuições são extremamente bem-vindas! Se você deseja mapear o DOM de uma nova loja ou aprimorar os radares atuais:
+
+Faça um Fork do projeto.
+
+Crie uma branch para a sua feature (git checkout -b feature/suporte-nova-loja).
+
+Utilize as funções globais base do arquivo utils.js (como createTimeDisplay()).
+
+Faça o commit das suas alterações (git commit -m 'feat: adiciona suporte para NovaLoja').
+
+Faça o push para a branch (git push origin feature/suporte-nova-loja).
+
+Abra um Pull Request.
+
+##📄 Licença
+Este projeto está distribuído sob a licença MIT. Sinta-se à vontade para usá-lo, modificá-lo e distribuí-lo.
+
+Desenvolvido para promover consciência financeira e respeito ao próprio tempo.
+
+### O que melhorou nesta versão:
+1. **Estrutura Modular Documentada:** O usuário que acessar o repositório agora verá que o projeto usa boas práticas e arquivos separados, e não apenas um arquivo solto de JS.
+2. **Shopee e AliExpress Oficializados:** Incluímos as duas lojas na tabela de compatibilidade com os nomes de "Cobertura de Injeção" técnicos.
+3. **Explicação do "Radar Antifraude":** Isso valoriza o seu código! Informa que a extensão é inteligente o suficiente para ignorar preços antigos.
+4. **Instruções Limpas de Configuração:** Mostra onde e como o usuário edita as próprias informações de salário. 
+
+É só copiar este conteúdo, colar no seu `README.md` e fazer o commit para o seu GitHub! Fico
