@@ -1,12 +1,8 @@
-# ⏱️ WorthMyTime Pro - O Custo Real das Coisas
+# ⏱️ WorthMyTime - O Custo Real das Coisas
 
 [![Licença: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Versão](https://img.shields.io/badge/Vers%C3%A3o-1.1-brightgreen.svg)](#)
 [![Stack](https://img.shields.io/badge/Stack-Vanilla_JS-yellow.svg)](#)
-
-<p align="center">
-  <img src="assets/logo-final.jpg" width="300" alt="WorthMyTime Logo - Balança de Tempo e Dinheiro">
-</p>
 
 O **WorthMyTime Pro** é uma extensão de produtividade e conscientização financeira para Google Chrome. Ela transforma a maneira como você enxerga os preços na internet: em vez de visualizar apenas o valor monetário de um produto, você visualiza **quanto tempo da sua vida** (em horas e minutos de trabalho) será necessário para adquiri-lo.
 
@@ -52,44 +48,41 @@ WorthMyTimePro/
     ├── utils.js          # Motores de cálculo e geradores de componentes DOM
     ├── content.js        # Regras de observação e injeção por domínio
     └── content.css       # Camada de estilos (CSS) isolada da lógica
-🚀 Instalação (Modo Desenvolvedor)
-Clone este repositório em sua máquina:
+```
+## 🚀 Como Instalar (Modo Desenvolvedor)
 
-Bash
-git clone [https://github.com/seu-usuario/worthmytime-pro.git](https://github.com/seu-usuario/worthmytime-pro.git)
-Abra o Google Chrome e acesse chrome://extensions/.
+Como a extensão ainda não está publicada na Chrome Web Store, você pode instalá-la manualmente no seu navegador em menos de 1 minuto:
 
-No canto superior direito, ative o "Modo do desenvolvedor".
+1. Baixe os arquivos deste repositório ou clone usando o Git:
+   `git clone https://github.com/SEU-USUARIO/worthmytime.git`
+2. Abra o Google Chrome e digite na barra de endereços: `chrome://extensions/`
+3. No canto superior direito, ative o botão **"Modo do desenvolvedor"**.
+4. Clique no botão **"Carregar sem compactação"** (ou *Load unpacked*).
+5. Selecione a pasta onde você salvou os arquivos do projeto.
+6. Pronto! O ícone do WorthMyTime aparecerá na barra de extensões do seu navegador.
 
-Clique em "Carregar sem compactação" (ou Load unpacked).
+## 📖 Como Usar
 
-Selecione a pasta principal do projeto. O ícone da extensão ficará disponível em seu navegador.
+1. Clique no ícone do **WorthMyTime** no topo do seu navegador para abrir o painel.
+2. Preencha suas configurações financeiras:
+   * **Moeda e Exibição:** Escolha R$ e como quer ver o tempo (ex: Dias).
+   * **Seus Ganhos:** Insira seu salário líquido e escolha se ele é Mensal, Diário ou por Hora.
+   * **Sua Escala:** Escolha sua rotina (ex: 5x2, 12x36).
+3. **Teste Rápido:** Você pode usar o campo "Teste um Preço" diretamente no painel para cálculos avulsos.
+4. **Mágica em Ação:** Acesse algum dos sites disponíveis(Amazon, Mercado-Livre e etc). Os preços dos produtos agora terão uma etiqueta ao lado ou abaixo do preço indicando o tempo exato de trabalho necessário para comprá-los!
 
-⚙️ Configuração Pessoal
-Para que a ferramenta calcule o tempo exato da sua realidade, edite as variáveis no arquivo scripts/config.js antes de carregar a extensão no Chrome:
+## 🤝 Como Contribuir
 
-JavaScript
-// scripts/config.js
-const SALARY_PER_MONTH = 3000; // Altere para seu salário líquido mensal
-const HOURS_PER_MONTH = 220;   // Altere para sua jornada de horas mensais
-Dica: Após alterar as configurações, clique no botão de "Recarregar" a extensão na aba chrome://extensions/.
+Contribuições são muito bem-vindas! Se você deseja adicionar suporte a uma nova loja ou melhorar a matemática do projeto:
 
-🤝 Como Contribuir
-Contribuições são extremamente bem-vindas! Se você deseja mapear o DOM de uma nova loja ou aprimorar os radares atuais:
+1. Faça um Fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/NovaLoja`)
+3. Faça o commit das suas alterações (`git commit -m 'Adiciona suporte para NovaLoja'`)
+4. Faça o push para a branch (`git push origin feature/NovaLoja`)
+5. Abra um Pull Request
 
-Faça um Fork do projeto.
+---
 
-Crie uma branch para a sua feature (git checkout -b feature/suporte-nova-loja).
+## 📄 Licença
 
-Utilize as funções globais base do arquivo utils.js (como createTimeDisplay()).
-
-Faça o commit das suas alterações (git commit -m 'feat: adiciona suporte para NovaLoja').
-
-Faça o push para a branch (git push origin feature/suporte-nova-loja).
-
-Abra um Pull Request.
-
-📄 Licença
-Este projeto está distribuído sob a licença MIT. Sinta-se à vontade para usá-lo, modificá-lo e distribuí-lo.
-
-Desenvolvido para promover consciência financeira e respeito ao próprio tempo.
+Este projeto está sob a licença MIT. Sinta-se livre para usá-lo, modificá-lo e distribuí-lo.
